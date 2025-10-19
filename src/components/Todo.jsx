@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useLocalStorage } from "../hooks/useLocalStorage";
 import TodoItem from "./TodoItem";
 
@@ -45,34 +45,41 @@ const Todo = () => {
     }
   };
 
-  const handleCompletedTask = (taskId) => {
-    setTodos((prevValue) => {
-      const copyTodo = [...prevValue];
-      copyTodo?.forEach((todo) => {
-        if (todo?.id === taskId) {
-          todo.isCompleted = !todo?.isCompleted;
-        }
-      });
-      return copyTodo;
-    });
-  };
+  //   const handleCompletedTask = useCallback((taskId) => {
+  //     setTodos((prevValue) => {
+  //       const copyTodo = [...prevValue];
+  //       return copyTodo?.map((todo) => {
+  //         if (todo?.id === taskId) {
+  //           return { ...todo, isCompleted: !todo?.isCompleted };
+  //         } else {
+  //           return todo;
+  //         }
+  //       });
+  //     });
+  //   }, []);
 
-  const handleRemoveTask = (taskId) => {
+  const handleRemoveTask = useCallback((taskId) => {
     setTodos((prevValue) =>
       [...prevValue]?.filter((todo) => todo?.id !== taskId)
     );
-  };
+  }, []);
 
-  const hadleEditTask = (taskId, updatedValue) => {
-    setTodos((prevValue) =>
-      prevValue?.map((todo) => {
+  const handleEditTask = useCallback((taskId, updatedValue) => {
+    setTodos((prevValue) => {
+      const copyTodo = [...prevValue];
+      return copyTodo?.map((todo) => {
         if (todo?.id === taskId) {
-          todo.title = updatedValue;
+          if (updatedValue) {
+            return { ...todo, title: updatedValue };
+          } else {
+            return { ...todo, isCompleted: !todo?.isCompleted };
+          }
+        } else {
+          return todo;
         }
-        return todo;
-      })
-    );
-  };
+      });
+    });
+  }, []);
 
   return (
     <div className="todos-container">
@@ -92,9 +99,8 @@ const Todo = () => {
             <TodoItem
               key={todo?.id}
               todo={todo}
-              handleCompletedTask={handleCompletedTask}
               handleRemoveTask={handleRemoveTask}
-              hadleEditTask={hadleEditTask}
+              handleEditTask={handleEditTask}
             />
           );
         })}
