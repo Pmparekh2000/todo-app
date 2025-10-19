@@ -6,6 +6,8 @@ const Todo = () => {
   const [inputValue, setInputValue] = useState("");
   const [todos, setTodos] = useState([]);
 
+  console.log("Rendering from Parent Todo component");
+
   const { setItem, getItem } = useLocalStorage();
 
   useEffect(() => {
@@ -61,6 +63,17 @@ const Todo = () => {
     );
   };
 
+  const hadleEditTask = (taskId, updatedValue) => {
+    setTodos((prevValue) =>
+      prevValue?.map((todo) => {
+        if (todo?.id === taskId) {
+          todo.title = updatedValue;
+        }
+        return todo;
+      })
+    );
+  };
+
   return (
     <div className="todos-container">
       <div>
@@ -81,6 +94,7 @@ const Todo = () => {
               todo={todo}
               handleCompletedTask={handleCompletedTask}
               handleRemoveTask={handleRemoveTask}
+              hadleEditTask={hadleEditTask}
             />
           );
         })}
